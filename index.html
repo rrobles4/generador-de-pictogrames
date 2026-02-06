@@ -194,6 +194,49 @@
             .graella { gap: 8px; }
             .pictograma { border: 3px solid #000; }
         }
+        /* --- ADAPTACIÓ PER A MÒBILS (RESPONSIVE) --- */
+        @media screen and (max-width: 850px) {
+            /* 1. Panell de control en columna */
+            .configuracio {
+                width: auto; margin: 10px; padding: 15px;
+            }
+            .fila-flex {
+                flex-direction: column; align-items: stretch; gap: 10px;
+            }
+            .columna, .control-estil {
+                width: 100%; flex: auto !important;
+            }
+            
+            /* 2. Barra d'eines vertical */
+            .barra-estils {
+                flex-direction: column; align-items: stretch;
+            }
+            
+            /* 3. Zona de resultats adaptable */
+            #zona-impressio {
+                width: 100%; /* S'adapta a la pantalla */
+                padding: 10px;
+                box-sizing: border-box; /* Perquè no surti fora */
+                height: auto; min-height: 50vh;
+            }
+            
+            /* 4. Fem que el full blanc no es vegi tallat */
+            body { padding: 0; background-color: #f0f8ff; }
+
+            /* 5. Botons més fàcils de clicar amb el dit */
+            .btn-container { flex-direction: column; }
+            button { padding: 15px; width: 100%; font-size: 1.1em; }
+
+            /* 6. Ajustem la graella perquè no es trenqui */
+            .graella { gap: 5px; }
+            .pictograma { border-width: 2px; border-radius: 8px; }
+            
+            /* 7. El Modal ocupa tota la pantalla al mòbil */
+            .modal-contingut {
+                width: 95%; height: 90vh; max-height: 90vh;
+            }
+            .resultats-grid { grid-template-columns: repeat(3, 1fr); }
+        }
     </style>
 </head>
 <body>
@@ -512,4 +555,5 @@
         </a>
     </p>
 </div></body>
+
 </html>
