@@ -144,6 +144,7 @@
             break-inside: avoid; page-break-inside: avoid;
             box-sizing: border-box;
             position: relative;
+            overflow: hidden; 
         }
         
         .pictograma:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
@@ -158,7 +159,7 @@
             font-size: calc(var(--mida-font-base) * (1 + (5 - var(--num-columnes)) * 0.25));
             font-family: var(--tipus-font); 
             color: var(--color-font);
-            line-height: 1.1;
+            line-height: 1.2;
             font-weight: bold;
             height: 30%;
             display: flex; align-items: center; justify-content: center; flex-direction: column;
@@ -171,7 +172,12 @@
 
         /* Darrere: Només Text */
         .mode-targeta-back .pictograma img { display: none; }
-        .mode-targeta-back .pictograma p { height: 100%; font-size: calc(var(--mida-font-base) * 2); } 
+        .mode-targeta-back .pictograma p { 
+            height: 100%; 
+            font-size: calc(var(--mida-font-base) * 2); 
+            justify-content: center;
+            align-content: center;
+        } 
         
         /* MODAL */
         #modal-edicio { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
@@ -182,9 +188,32 @@
         .modal-body { padding: 25px; overflow-y: auto; }
         
         .grup-titol-modal { margin-bottom: 20px; text-align: center; }
-        .inputs-container-modal { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-        .inputs-container-modal input { width: 100%; font-size: 1.1em; text-align: center; border: 2px solid #ddd; padding: 8px; border-radius: 6px; box-sizing: border-box; }
         
+        /* NOUS ESTILS INPUTS MODAL (COMPACTE) */
+        .inputs-container-modal { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            margin-bottom: 15px; 
+            justify-content: center;
+        }
+        
+        .inputs-container-modal input { 
+            font-size: 1.1em; 
+            text-align: center; 
+            border: 2px solid #ddd; 
+            padding: 8px; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+        }
+
+        /* Layout Standard: 2 columnes (50% cadascuna) */
+        .layout-standard input { width: 48%; }
+        
+        /* Layout Flashcard: 2 a dalt (48%), 3 a sota (31%) */
+        .layout-flashcard input:nth-child(-n+2) { width: 48%; }
+        .layout-flashcard input:nth-child(n+3) { width: 31%; }
+
         .cerca-wrapper { display: flex; gap: 8px; margin-bottom: 15px; }
         .btn-cerca-modal { background: var(--color-principal); border-radius: 8px; padding: 10px 20px; font-size: 1em; flex-shrink: 0; color: white; border: none; cursor: pointer; }
         .btn-cerca-wiki { background: var(--color-secundari); }
@@ -222,9 +251,10 @@
             body { padding: 0; background-color: #f0f8ff; }
             .btn-container { flex-direction: column; }
             button { padding: 15px; width: 100%; font-size: 1.1em; }
-            .graella { gap: 5px; }
             .modal-contingut { width: 95%; height: 90vh; max-height: 90vh; }
-            .resultats-grid { grid-template-columns: repeat(3, 1fr); }
+            
+            /* En mòbil, tornem a posar els inputs un sota l'altre per comoditat */
+            .layout-standard input, .layout-flashcard input { width: 100% !important; }
         }
     </style>
 </head>
@@ -249,12 +279,19 @@
                 <label>Curs:</label>
                 <input type="text" id="curs" placeholder="Ex: 3r A">
             </div>
-            <div class="columna" style="flex: 0.5;">
-                <label>Idioma (Cerca):</label>
+            <div class="columna" style="flex: 0.8;">
+                <label>Idioma (Cerca ARASAAC):</label>
                 <select id="idioma">
                     <option value="ca">Català</option>
                     <option value="es">Castellano</option>
                     <option value="en">English</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="it">Italiano</option>
+                    <option value="pt">Português</option>
+                    <option value="ar">عربي (Àrab)</option>
+                    <option value="ru">Pусский (Rus)</option>
+                    <option value="zh">中文 (Xinès)</option>
                 </select>
             </div>
         </div>
@@ -304,7 +341,7 @@
         </div>
 
         <div class="instruccions no-print">
-            <strong>💡 Consell:</strong> Pots arrossegar les targetes per reordenar-les. Fes clic a sobre de qualsevol imatge (o text del darrere) per editar-la i <strong>afegir més paraules/idiomes</strong>.
+            <strong>💡 Consell:</strong> pots arrossegar les targetes per reordenar-les. També pots fer clic a sobre de qualsevol imatge (o text del darrere) per editar-la i afegir més paraules en altres idiomes si és necessari.
         </div>
 
         <p class="no-print" style="text-align:center; color:#e74c3c; font-size:0.85em; margin-top:15px; margin-bottom:0;">
@@ -471,12 +508,12 @@
             div.className = 'pictograma';
             div.draggable = true; 
             div.dataset.index = index; 
-            // Guardem la paraula inicial com a llista JSON per facilitar edició posterior
+            
             if (!div.dataset.textos) {
                 div.dataset.textos = JSON.stringify([paraula]);
             }
             
-            // Events Drag & Drop + Click (ara per tothom)
+            // Events
             div.addEventListener('click', () => { if(!div.classList.contains('dragging')) obrirModal(div); });
             div.addEventListener('dragstart', () => { div.classList.add('dragging'); });
             div.addEventListener('dragend', () => { div.classList.remove('dragging'); });
@@ -546,36 +583,42 @@
             doc.setProperty('--num-columnes', document.getElementById('selector-columnes').value);
         }
 
-        // MODALS
+        // MODALS I LÒGICA D'ESCALAT DE FONT I INPUTS
         function obrirModal(el) {
             elementEditant = el;
             const index = el.dataset.index;
             const mode = document.getElementById('selector-mode').value;
             
-            // Recuperem textos o inicialitzem
             let textos = [];
-            // Intentem llegir del dataset, si no, agafem el text visible
             if (el.dataset.textos) {
                 textos = JSON.parse(el.dataset.textos);
             } else {
                 textos = [document.getElementById(`text-${index}-front`).innerText];
             }
 
-            // Generar inputs segons el límit
             const limit = (mode === 'standard') ? 2 : 5;
             const container = document.getElementById('camps-text');
             container.innerHTML = '';
+            
+            // Netejar classes antigues
+            container.className = 'inputs-container-modal';
+            
+            // Afegir classe segons mode per ajustar CSS Grid/Flex
+            if(mode === 'standard') {
+                container.classList.add('layout-standard');
+            } else {
+                container.classList.add('layout-flashcard');
+            }
 
             for(let i=0; i<limit; i++) {
                 let input = document.createElement('input');
                 input.type = 'text';
                 input.placeholder = (i===0) ? "Paraula principal" : `Traducció / Paraula ${i+1}`;
-                input.value = textos[i] || ""; // Omplir si existeix
+                input.value = textos[i] || ""; 
                 input.id = `input-modal-${i}`;
                 container.appendChild(input);
             }
 
-            // Configurar inputs cerca
             const primerText = textos[0] || "";
             document.getElementById('input-arasaac').value = primerText;
             document.getElementById('input-wiki').value = primerText;
@@ -599,27 +642,30 @@
                     if(inp.value.trim() !== "") nousTextos.push(inp.value.trim());
                 });
 
-                // Si no hi ha res, mantenim buit o un guió
                 if (nousTextos.length === 0) nousTextos = [""];
 
-                // Guardar al dataset de l'element (i del seu parell)
-                // Com que 'elementEditant' és el DIV clicat, hem de trobar el seu parell si existeix
-                // Per simplicitat, busquem tots els divs amb el mateix index
                 const parells = document.querySelectorAll(`.pictograma[data-index="${index}"]`);
                 parells.forEach(div => {
                     div.dataset.textos = JSON.stringify(nousTextos);
                 });
 
-                // ACTUALITZAR VISUALITZACIÓ
                 const txtFront = document.getElementById(`text-${index}-front`);
                 const txtBack = document.getElementById(`text-${index}-back`);
 
                 if (mode === 'standard') {
-                    // Separats per barra
                     if(txtFront) txtFront.innerText = nousTextos.join(" / ");
                 } else {
-                    // Mode targeta: Front res (ocult per CSS), Back llista vertical
-                    if(txtBack) txtBack.innerHTML = nousTextos.join("<br><br>");
+                    if(txtBack) {
+                        txtBack.innerHTML = nousTextos.join("<br>");
+                        
+                        const num = nousTextos.length;
+                        let escala = "2em"; 
+                        if (num === 3) escala = "1.5em"; 
+                        if (num === 4) escala = "1.2em"; 
+                        if (num >= 5) escala = "1em"; 
+
+                        txtBack.style.fontSize = escala;
+                    }
                 }
             }
             tancarModal();
