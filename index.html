@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Pictogrames</title>
-<meta name="author" content="Rafa Robles Fontanet">
+    
+    <meta name="author" content="Rafa Robles Fontanet">
     <meta name="copyright" content="Rafa Robles Fontanet 2026">
     <meta name="license" content="CC BY-NC-SA 4.0">
-    <meta name="description" content="Eina per generar fitxes de vocabulari amb pictogrames per a escoles.">
+    <meta name="description" content="Generador de pictogrames i targetes flashcards per a l'escola.">
+
+    <title>Generador de Pictogrames</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Andika&family=Dancing+Script:wght@400;700&family=Fredoka:wght@400;600&family=Indie+Flower&family=Patrick+Hand&family=Roboto&display=swap" rel="stylesheet">
     
@@ -92,7 +94,6 @@
             box-sizing: border-box; 
         }
 
-        /* CAPÇALERA IMPRESSIÓ */
         .header-print {
             display: grid;
             grid-template-columns: 120px 1fr 120px; 
@@ -115,6 +116,14 @@
             width: 100%;
         }
 
+        /* CONFIGURACIÓ ESPECIAL PER AL REVERS (PÀGINA 2) */
+        .zona-revers {
+            display: none; /* Per defecte amagat */
+            margin-top: 50px;
+            border-top: 2px dashed #ccc;
+            padding-top: 20px;
+        }
+
         /* --- DISSENY DE LA TARGETA --- */
         .pictograma {
             border: 3px solid #000; 
@@ -127,6 +136,7 @@
             cursor: grab; 
             break-inside: avoid; page-break-inside: avoid;
             box-sizing: border-box;
+            position: relative;
         }
         
         .pictograma:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
@@ -147,45 +157,33 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* MODAL */
-        #modal-edicio {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 1000;
-            justify-content: center; align-items: center;
-        }
-        .modal-contingut {
-            background: white; border-radius: 12px; width: 90%; max-width: 650px; 
-            display: flex; flex-direction: column; max-height: 90vh; overflow: hidden;
-        }
-        .modal-tabs { display: flex; background: #f1f1f1; border-bottom: 1px solid #ddd; }
-        .tab-btn {
-            flex: 1; padding: 12px; border: none; background: none; cursor: pointer;
-            font-weight: bold; color: #555; border-bottom: 3px solid transparent;
-        }
-        .tab-btn.actiu { border-bottom: 3px solid var(--color-principal); color: var(--color-principal); background: white; }
-        
-        .modal-body { padding: 25px; overflow-y: auto; }
-        
-        .grup-titol-modal { margin-bottom: 20px; text-align: center; }
-        .grup-titol-modal label { font-size: 1.1em; color: var(--color-principal); margin-bottom: 8px; }
-        .nom-editable { 
-            width: 100%; font-size: 1.3em; font-weight: bold; text-align: center; 
-            border: 2px solid #eee; border-radius: 8px; padding: 8px; 
-        }
+        /* --- MODS TARGETA (FLASHCARD) --- */
+        /* Davant: Només Imatge */
+        .mode-targeta-front .pictograma img { height: 100%; }
+        .mode-targeta-front .pictograma p { display: none; }
 
+        /* Darrere: Només Text */
+        .mode-targeta-back .pictograma img { display: none; }
+        .mode-targeta-back .pictograma p { height: 100%; font-size: calc(var(--mida-font-base) * 2); } /* Text gegant */
+        
+        /* MODAL */
+        #modal-edicio { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-contingut { background: white; border-radius: 12px; width: 90%; max-width: 650px; display: flex; flex-direction: column; max-height: 90vh; overflow: hidden; }
+        .modal-tabs { display: flex; background: #f1f1f1; border-bottom: 1px solid #ddd; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; cursor: pointer; font-weight: bold; color: #555; border-bottom: 3px solid transparent; }
+        .tab-btn.actiu { border-bottom: 3px solid var(--color-principal); color: var(--color-principal); background: white; }
+        .modal-body { padding: 25px; overflow-y: auto; }
+        .grup-titol-modal { margin-bottom: 20px; text-align: center; }
+        .nom-editable { width: 100%; font-size: 1.3em; font-weight: bold; text-align: center; border: 2px solid #eee; border-radius: 8px; padding: 8px; }
         .cerca-wrapper { display: flex; gap: 8px; margin-bottom: 15px; }
-        .btn-cerca-modal {
-            background: var(--color-principal); border-radius: 8px; padding: 10px 20px;
-            font-size: 1em; flex-shrink: 0; color: white; border: none; cursor: pointer;
-        }
+        .btn-cerca-modal { background: var(--color-principal); border-radius: 8px; padding: 10px 20px; font-size: 1em; flex-shrink: 0; color: white; border: none; cursor: pointer; }
         .btn-cerca-wiki { background: var(--color-secundari); }
         .btn-cerca-open { background: #333; }
-
         .resultats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; margin-top: 15px; }
         .resultats-grid img { width: 100%; height: 90px; object-fit: contain; border: 1px solid #eee; border-radius: 8px; cursor: pointer; padding: 5px; }
         .resultats-grid img:hover { transform: scale(1.05); border-color: var(--color-principal); background: #f0f8ff; }
 
-        /* --- IMPRESSIÓ NETA --- */
+        /* --- IMPRESSIÓ NETA I LÒGICA DOBLE CARA --- */
         @media print {
             @page { size: A4 portrait; margin: 0 !important; }
             body { background: white; padding: 0; margin: 0; -webkit-print-color-adjust: exact; }
@@ -193,48 +191,32 @@
             #zona-impressio { padding: 15mm; width: 100%; max-width: 210mm; margin: 0 auto; box-shadow: none; }
             .graella { gap: 8px; }
             .pictograma { border: 3px solid #000; }
+            
+            /* Lògica per Targetes (Flashcards) */
+            .zona-revers {
+                display: block !important; /* Mostrar revers */
+                border: none; margin: 0; padding: 0;
+                page-break-before: always; /* SEMPRE en pàgina nova */
+                
+                /* TRUC DEL MIRALL: Invertim l'ordre de la graella */
+                /* Això fa que el 1r item surti a la dreta (RTL) */
+                /* En girar el full, coincidirà amb el 1r item del davant (Left) */
+                direction: rtl; 
+            }
         }
+
         /* --- ADAPTACIÓ PER A MÒBILS (RESPONSIVE) --- */
         @media screen and (max-width: 850px) {
-            /* 1. Panell de control en columna */
-            .configuracio {
-                width: auto; margin: 10px; padding: 15px;
-            }
-            .fila-flex {
-                flex-direction: column; align-items: stretch; gap: 10px;
-            }
-            .columna, .control-estil {
-                width: 100%; flex: auto !important;
-            }
-            
-            /* 2. Barra d'eines vertical */
-            .barra-estils {
-                flex-direction: column; align-items: stretch;
-            }
-            
-            /* 3. Zona de resultats adaptable */
-            #zona-impressio {
-                width: 100%; /* S'adapta a la pantalla */
-                padding: 10px;
-                box-sizing: border-box; /* Perquè no surti fora */
-                height: auto; min-height: 50vh;
-            }
-            
-            /* 4. Fem que el full blanc no es vegi tallat */
+            .configuracio { width: auto; margin: 10px; padding: 15px; }
+            .fila-flex { flex-direction: column; align-items: stretch; gap: 10px; }
+            .columna, .control-estil { width: 100%; flex: auto !important; }
+            .barra-estils { flex-direction: column; align-items: stretch; }
+            #zona-impressio { width: 100%; padding: 10px; box-sizing: border-box; height: auto; min-height: 50vh; }
             body { padding: 0; background-color: #f0f8ff; }
-
-            /* 5. Botons més fàcils de clicar amb el dit */
             .btn-container { flex-direction: column; }
             button { padding: 15px; width: 100%; font-size: 1.1em; }
-
-            /* 6. Ajustem la graella perquè no es trenqui */
             .graella { gap: 5px; }
-            .pictograma { border-width: 2px; border-radius: 8px; }
-            
-            /* 7. El Modal ocupa tota la pantalla al mòbil */
-            .modal-contingut {
-                width: 95%; height: 90vh; max-height: 90vh;
-            }
+            .modal-contingut { width: 95%; height: 90vh; max-height: 90vh; }
             .resultats-grid { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
@@ -272,6 +254,13 @@
 
         <div class="barra-estils">
             <div class="control-estil" style="flex:1;">
+                <label>Mètode</label>
+                <select id="selector-mode" onchange="generarDocument()">
+                    <option value="standard">Estàndard (Imatge + Text)</option>
+                    <option value="targeta">Targeta (Doble Cara)</option>
+                </select>
+            </div>
+            <div class="control-estil" style="flex:1;">
                 <label>Mida / Columnes</label>
                 <select id="selector-columnes" onchange="actualitzarEstils()">
                     <option value="1">1 (Gegant)</option>
@@ -292,12 +281,8 @@
                 </select>
             </div>
             <div class="control-estil" style="flex:0.8;">
-                <label>Mida Lletra Base</label>
+                <label>Mida Lletra</label>
                 <input type="range" id="selector-mida" min="12" max="30" value="18" oninput="actualitzarEstils()">
-            </div>
-            <div class="control-estil" style="flex:0.5;">
-                <label>Color</label>
-                <input type="color" id="selector-color" value="#000000" onchange="actualitzarEstils()">
             </div>
         </div>
 
@@ -329,6 +314,21 @@
             </div>
         </div>
         <div class="graella" id="contenidor-picts"></div>
+
+        <div id="contenidor-revers-wrapper" class="zona-revers">
+            <div class="no-print" style="text-align:center; color:#999; margin-bottom:10px;">--- REVERS DEL FULL (Doble Cara) ---</div>
+            <div class="graella" id="contenidor-revers"></div>
+        </div>
+    </div>
+
+    <div class="no-print" style="text-align: center; margin-top: 40px; padding: 20px; font-size: 0.8em; color: #666; border-top: 1px solid #eee;">
+        <p style="margin: 0;">Creat per <b>Rafa Robles Fontanet</b> | <b>Escola Pau Picasso</b></p>
+        <p style="margin: 5px 0;">
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color: #4a90e2; text-decoration: none;">
+                <img alt="Llicència de Creative Commons" style="border-width:0; vertical-align: middle;" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" />
+                <br />Aquesta obra està subjecta a una llicència de Reconeixement-NoComercial-CompartirIgual 4.0 Internacional de Creative Commons
+            </a>
+        </p>
     </div>
 
     <div id="modal-edicio">
@@ -339,44 +339,27 @@
                 <button class="tab-btn" onclick="canviarPestanya('tab-simbols')">✒️ Símbols</button>
                 <button class="tab-btn" onclick="canviarPestanya('tab-pujar')">📤 Pujar/IA</button>
             </div>
-            
             <div class="modal-body">
                 <div class="grup-titol-modal">
                     <label>Títol de la targeta</label>
                     <input type="text" id="nom-editable" class="nom-editable">
                 </div>
-
                 <div id="tab-arasaac" class="contingut-tab">
-                    <div class="cerca-wrapper">
-                        <input id="input-arasaac" onkeyup="if(event.key==='Enter') buscarArasaacModal()">
-                        <button class="btn-cerca-modal" onclick="buscarArasaacModal()">🔍 Cerca la imatge</button>
-                    </div>
+                    <div class="cerca-wrapper"><input id="input-arasaac" onkeyup="if(event.key==='Enter') buscarArasaacModal()"><button class="btn-cerca-modal" onclick="buscarArasaacModal()">🔍 Cerca</button></div>
                     <div id="resultats-arasaac" class="resultats-grid"></div>
                 </div>
-
                 <div id="tab-wiki" class="contingut-tab" style="display:none;">
-                    <div class="cerca-wrapper">
-                        <input id="input-wiki" onkeyup="if(event.key==='Enter') buscarWikiImages()">
-                        <button class="btn-cerca-modal btn-cerca-wiki" onclick="buscarWikiImages()">📷 Cerca la imatge</button>
-                    </div>
+                    <div class="cerca-wrapper"><input id="input-wiki" onkeyup="if(event.key==='Enter') buscarWikiImages()"><button class="btn-cerca-modal btn-cerca-wiki" onclick="buscarWikiImages()">📷 Cerca</button></div>
                     <div id="resultats-wiki" class="resultats-grid"></div>
                 </div>
-
                 <div id="tab-simbols" class="contingut-tab" style="display:none;">
-                    <div class="cerca-wrapper">
-                        <input id="input-open" onkeyup="if(event.key==='Enter') buscarOpenSymbols()">
-                        <button class="btn-cerca-modal btn-cerca-open" onclick="buscarOpenSymbols()">✒️ Cerca la imatge</button>
-                    </div>
+                    <div class="cerca-wrapper"><input id="input-open" onkeyup="if(event.key==='Enter') buscarOpenSymbols()"><button class="btn-cerca-modal btn-cerca-open" onclick="buscarOpenSymbols()">✒️ Cerca</button></div>
                     <div id="resultats-open" class="resultats-grid"></div>
                 </div>
-
                 <div id="tab-pujar" class="contingut-tab" style="display:none;text-align:center;">
-                    <p>Puja una imatge pròpia:</p>
-                    <input type="file" accept="image/*" onchange="pujarImatge(this)">
+                    <p>Puja una imatge pròpia:</p><input type="file" accept="image/*" onchange="pujarImatge(this)">
                     <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
-                    <button onclick="window.open('https://www.craiyon.com/','_blank','width=400,height=600')" style="background:#333;color:white;margin:auto;padding:15px;border-radius:50px;">
-                        🎨 Generar amb IA
-                    </button>
+                    <button onclick="window.open('https://www.craiyon.com/','_blank','width=400,height=600')" style="background:#333;color:white;margin:auto;padding:15px;border-radius:50px;">🎨 Generar amb IA</button>
                 </div>
             </div>
             <div style="padding:15px;background:#f9f9f9;text-align:right;">
@@ -389,6 +372,7 @@
     <script>
         let idiomaSeleccionat = 'ca';
         let elementEditant = null;
+        let dadesTargetes = []; // Guardem les dades per poder regenerar
 
         // 1. LOGO
         function carregarLogo(input) {
@@ -409,6 +393,7 @@
             const titol = document.getElementById('titol-doc').value || "Sense títol";
             const curs = document.getElementById('curs').value;
             const textParaules = document.getElementById('llista-paraules').value;
+            const mode = document.getElementById('selector-mode').value;
             idiomaSeleccionat = document.getElementById('idioma').value;
 
             document.getElementById('titol-resultat').innerText = titol;
@@ -417,89 +402,133 @@
             else { cursEl.style.display='none'; }
 
             const contenidor = document.getElementById('contenidor-picts');
-            contenidor.innerHTML = '';
+            const contenidorRevers = document.getElementById('contenidor-revers');
+            const wrapperRevers = document.getElementById('contenidor-revers-wrapper');
 
-            if (!textParaules.trim()) return alert("Escriu paraules!");
+            contenidor.innerHTML = '';
+            contenidorRevers.innerHTML = '';
+            
+            // Gestió visual del mode Targeta
+            if (mode === 'targeta') {
+                wrapperRevers.style.display = 'block';
+                contenidor.classList.add('mode-targeta-front');
+                contenidorRevers.classList.add('mode-targeta-back');
+            } else {
+                wrapperRevers.style.display = 'none';
+                contenidor.classList.remove('mode-targeta-front');
+                contenidorRevers.classList.remove('mode-targeta-back');
+            }
+
+            if (!textParaules.trim()) return; // No alertem si està buit per evitar spam en canviar mode
             const llista = textParaules.split(',').map(p=>p.trim()).filter(p=>p!=='');
             
-            for (let paraula of llista) {
-                await crearTargeta(contenidor, paraula);
+            dadesTargetes = []; // Reiniciem dades
+            
+            for (let i = 0; i < llista.length; i++) {
+                let paraula = llista[i];
+                
+                // Pàgina 1 (Front)
+                const divFront = crearElementTargeta(paraula, i, 'front');
+                contenidor.appendChild(divFront);
+
+                // Pàgina 2 (Revers) - Només si és mode targeta
+                if (mode === 'targeta') {
+                    const divBack = crearElementTargeta(paraula, i, 'back');
+                    contenidorRevers.appendChild(divBack);
+                }
+                
+                // Buscar imatge (només una vegada)
+                buscarArasaacAuto(paraula, i);
             }
             actualitzarEstils();
         }
 
-        async function crearTargeta(contenidor, paraula) {
+        function crearElementTargeta(paraula, index, tipus) {
             const div = document.createElement('div');
             div.className = 'pictograma';
             div.draggable = true; 
-
-            div.addEventListener('click', () => { if(!div.classList.contains('dragging')) obrirModal(div); });
+            div.dataset.index = index; // Vinculem front i back pel ID
+            
+            // Events Drag & Drop
+            div.addEventListener('click', () => { if(!div.classList.contains('dragging') && tipus === 'front') obrirModal(div); });
             div.addEventListener('dragstart', () => { div.classList.add('dragging'); });
             div.addEventListener('dragend', () => { div.classList.remove('dragging'); });
 
             const img = document.createElement('img');
+            img.id = `img-${index}-${tipus}`; // ID únic
             img.src = 'https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png'; 
             
             const p = document.createElement('p');
+            p.id = `text-${index}-${tipus}`;
             p.innerText = paraula;
 
             div.appendChild(img);
             div.appendChild(p);
-            contenidor.appendChild(div);
-
-            buscarArasaacAuto(paraula, img);
+            return div;
         }
 
-        // DRAG & DROP
-        const contenidor = document.getElementById('contenidor-picts');
-        contenidor.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            const dragging = document.querySelector('.dragging');
-            if(!dragging) return;
-            
-            const siblings = [...contenidor.querySelectorAll('.pictograma:not(.dragging)')];
-            let closest = null;
-            let minDistance = Number.POSITIVE_INFINITY;
-
-            siblings.forEach(sibling => {
-                const box = sibling.getBoundingClientRect();
-                const dx = e.clientX - (box.left + box.width / 2);
-                const dy = e.clientY - (box.top + box.height / 2);
-                const distance = Math.sqrt(dx*dx + dy*dy);
-                if (distance < minDistance) { minDistance = distance; closest = sibling; }
+        // DRAG & DROP (Aplicat a ambdós contenidors)
+        [document.getElementById('contenidor-picts'), document.getElementById('contenidor-revers')].forEach(cont => {
+            cont.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const dragging = document.querySelector('.dragging');
+                if(!dragging) return;
+                const siblings = [...cont.querySelectorAll('.pictograma:not(.dragging)')];
+                let closest = null; let minDistance = Infinity;
+                siblings.forEach(sibling => {
+                    const box = sibling.getBoundingClientRect();
+                    const dx = e.clientX - (box.left + box.width / 2);
+                    const dy = e.clientY - (box.top + box.height / 2);
+                    const d = Math.sqrt(dx*dx + dy*dy);
+                    if (d < minDistance) { minDistance = d; closest = sibling; }
+                });
+                if (closest) {
+                    const box = closest.getBoundingClientRect();
+                    if(e.clientX > box.left + box.width/2) cont.insertBefore(dragging, closest.nextSibling);
+                    else cont.insertBefore(dragging, closest);
+                } else cont.appendChild(dragging);
             });
-
-            if (closest) {
-                const box = closest.getBoundingClientRect();
-                if(e.clientX > box.left + box.width/2) contenidor.insertBefore(dragging, closest.nextSibling);
-                else contenidor.insertBefore(dragging, closest);
-            } else {
-                contenidor.appendChild(dragging);
-            }
         });
 
-        // FUNCIONS ESTIL
-        async function buscarArasaacAuto(text, img) {
+        // FUNCIONS ESTIL I API
+        async function buscarArasaacAuto(text, index) {
             try {
                 const r = await fetch(`https://api.arasaac.org/api/pictograms/${idiomaSeleccionat}/search/${encodeURIComponent(text)}`);
                 const d = await r.json();
-                if(d.length) img.src = `https://static.arasaac.org/pictograms/${d[0]._id}/${d[0]._id}_500.png`;
-                else { img.src = "https://static.arasaac.org/images/no_results.png"; img.style.opacity="0.3"; }
+                let src = "https://static.arasaac.org/images/no_results.png";
+                let opacitat = "0.3";
+                
+                if(d.length) {
+                    src = `https://static.arasaac.org/pictograms/${d[0]._id}/${d[0]._id}_500.png`;
+                    opacitat = "1";
+                }
+                
+                // Actualitzar Front i Back (si existeix)
+                actualitzarImatgeTargeta(index, src, opacitat);
+                
             } catch(e){}
+        }
+
+        function actualitzarImatgeTargeta(index, src, opacitat) {
+            const imgFront = document.getElementById(`img-${index}-front`);
+            const imgBack = document.getElementById(`img-${index}-back`);
+            if(imgFront) { imgFront.src = src; imgFront.style.opacity = opacitat; }
+            if(imgBack) { imgBack.src = src; } // Al back l'img està oculta per CSS, però l'actualitzem igual
         }
 
         function actualitzarEstils() {
             const doc = document.documentElement.style;
             doc.setProperty('--tipus-font', document.getElementById('selector-font').value);
             doc.setProperty('--mida-font-base', document.getElementById('selector-mida').value + 'px');
-            doc.setProperty('--color-font', document.getElementById('selector-color').value);
             doc.setProperty('--num-columnes', document.getElementById('selector-columnes').value);
         }
 
         // MODALS
         function obrirModal(el) {
             elementEditant = el;
-            const nom = el.querySelector('p').innerText;
+            const index = el.dataset.index;
+            const nom = document.getElementById(`text-${index}-front`).innerText;
+            
             document.getElementById('nom-editable').value = nom;
             document.getElementById('input-arasaac').value = nom;
             document.getElementById('input-wiki').value = nom;
@@ -508,10 +537,21 @@
             canviarPestanya('tab-arasaac'); buscarArasaacModal();
         }
         function tancarModal() { document.getElementById('modal-edicio').style.display = 'none'; elementEditant=null; }
+        
         function guardarTancar() {
-            if(elementEditant) elementEditant.querySelector('p').innerText = document.getElementById('nom-editable').value;
+            if(elementEditant) {
+                const index = elementEditant.dataset.index;
+                const nouText = document.getElementById('nom-editable').value;
+                
+                // Actualitzar Front i Back
+                const txtFront = document.getElementById(`text-${index}-front`);
+                const txtBack = document.getElementById(`text-${index}-back`);
+                if(txtFront) txtFront.innerText = nouText;
+                if(txtBack) txtBack.innerText = nouText;
+            }
             tancarModal();
         }
+        
         function canviarPestanya(id) {
             document.querySelectorAll('.contingut-tab').forEach(e=>e.style.display='none');
             document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('actiu'));
@@ -519,7 +559,13 @@
             const map = {'tab-arasaac':0, 'tab-wiki':1, 'tab-simbols':2, 'tab-pujar':3};
             document.querySelectorAll('.tab-btn')[map[id]].classList.add('actiu');
         }
-        function aplicarImatge(src) { if(elementEditant) { elementEditant.querySelector('img').src = src; elementEditant.querySelector('img').style.opacity='1'; } }
+        
+        function aplicarImatge(src) { 
+            if(elementEditant) { 
+                const index = elementEditant.dataset.index;
+                actualitzarImatgeTargeta(index, src, '1');
+            } 
+        }
 
         // CERQUES
         async function buscarArasaacModal() {
@@ -554,7 +600,5 @@
             <br />Aquesta obra està subjecta a una llicència de Reconeixement-NoComercial-CompartirIgual 4.0 Internacional de Creative Commons
         </a>
     </p>
-</div></body>
-
+</body>
 </html>
-
