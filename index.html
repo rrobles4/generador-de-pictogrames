@@ -91,7 +91,7 @@
         }
         @keyframes popIn { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
 
-        /* Consell Verd (Recuperat) */
+        /* Consell Verd */
         .instruccions {
             background-color: #e8f6f3; border: 1px solid #a2d9ce; color: #16a085;
             padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 0.9em; text-align: center;
@@ -514,7 +514,7 @@
             
             if (mode === 'domino') {
                 btnMix.style.display = 'flex';
-                instruccions.innerHTML = "Consell: Arrossega per reordenar. Fes clic als dibuixos o noms per editar.";
+                instruccions.innerHTML = "Consell: clica a \"Barrejar fitxes\" per reordenar els dibuixos i les paraules de forma aleatòria. Pots clicar els dibuixos i les paraules per editar-les.";
             } else {
                 btnMix.style.display = 'none';
                 instruccions.innerHTML = "Consell: Arrossega per reordenar. Fes clic als dibuixos o noms per editar.";
@@ -648,7 +648,7 @@
             
             const btn = document.getElementById('btn-mix');
             btn.innerText = "✅ Fet!";
-            setTimeout(()=> btn.innerText = "𔗤 Barrejar fitxes", 1500);
+            setTimeout(()=> btn.innerHTML = "𔗤 Barrejar fitxes", 1500);
         }
 
         function crearElementTargeta(paraula, index, tipus) {
