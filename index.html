@@ -70,9 +70,7 @@
             display: flex; gap: 15px; align-items: center; justify-content: space-between; flex-wrap: wrap;
         }
         .control-estil { display: flex; flex-direction: column; min-width: 90px; }
-        input[type="color"] { border: none; width: 100%; height: 40px; cursor: pointer; background: none; }
-        textarea { height: 80px; resize: vertical; }
-
+        
         .btn-container { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;}
         button {
             border: none; padding: 12px 25px; font-size: 16px; border-radius: 50px;
@@ -88,13 +86,13 @@
         .btn-domino { 
             background-color: var(--color-secundari); 
             flex: 2; 
-            display: none; /* Ocult per defecte */
+            display: none; 
             animation: popIn 0.3s ease;
         }
         @keyframes popIn { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
 
         .instruccions {
-            background-color: #e8f6f3; border: 1px solid #a2d9ce; color: #16a085;
+            background-color: #fff8e1; border: 1px solid #ffe082; color: #d35400;
             padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 0.9em; text-align: center;
         }
 
@@ -176,29 +174,29 @@
         .mode-targeta-front .pictograma p { display: none; }
         .mode-targeta-back .pictograma img { display: none; }
 
-        /* --- MODE DOMINÓ (NOU) --- */
+        /* --- MODE DOMINÓ --- */
         .mode-domino .graella {
-            grid-template-columns: repeat(2, 1fr) !important; /* Sempre 2 columnes en dominó per aprofitar espai */
+            grid-template-columns: repeat(2, 1fr) !important; /* Sempre 2 columnes */
         }
         
         .mode-domino .pictograma {
             flex-direction: row; /* Horitzontal */
-            aspect-ratio: 2.5 / 1; /* Més ample que alt */
+            aspect-ratio: 2.5 / 1; 
             padding: 5px;
-            gap: 10px;
+            gap: 0; /* Sense gap, gestionat pel separador */
         }
 
         .mode-domino .pictograma img {
-            width: 45%; height: 90%; order: 1;
+            width: 48%; height: 90%; order: 1;
         }
 
+        /* Línia vertical negra */
         .separador-domino {
             display: none;
-            width: 20px; height: 20px;
-            background: radial-gradient(circle, #ffd700 0%, #daa520 100%);
-            border-radius: 50%;
-            border: 2px solid #b8860b;
-            box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            width: 2px;
+            height: 90%;
+            background-color: #000;
+            margin: 0 10px;
             flex-shrink: 0;
             order: 2;
         }
@@ -207,7 +205,7 @@
 
         .mode-domino .text-domino {
             order: 3;
-            width: 45%; height: 90%;
+            width: 48%; height: 90%;
             display: flex; align-items: center; justify-content: center;
             text-align: center;
             font-family: var(--tipus-font);
@@ -216,8 +214,7 @@
             overflow: hidden;
         }
 
-        .mode-domino .pictograma p { display: none; } /* Ocultem el p estàndard */
-
+        .mode-domino .pictograma p { display: none; } 
 
         /* Contenidor especial per al text del darrere (Flashcard) */
         .contingut-back {
@@ -232,6 +229,19 @@
             font-family: var(--tipus-font); font-weight: bold;
             color: var(--color-font); line-height: 1.1; margin: 2px 0;
         }
+
+        /* AVISOS D'IMPRESSIÓ */
+        .avis-impressio {
+            margin-top: 30px; 
+            padding: 15px; 
+            background-color: #ffecec; 
+            border: 1px solid #ffcccc; 
+            border-radius: 8px;
+            color: #c0392b;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        .avis-impressio strong { display: block; margin-bottom: 5px; font-size: 1.1em; }
 
         /* MODAL */
         #modal-edicio { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
@@ -266,15 +276,16 @@
 
         /* --- IMPRESSIÓ NETA --- */
         @media print {
-            @page { margin: 0 !important; } /* Deixem que el navegador s'adapti a la mida del div */
+            @page { margin: 0 !important; }
             body { background: white; padding: 0; margin: 0; -webkit-print-color-adjust: exact; }
-            .configuracio, .no-print, #modal-edicio { display: none !important; }
+            .configuracio, .no-print, #modal-edicio, .avis-impressio { display: none !important; }
             #zona-impressio { margin: 0 auto; box-shadow: none; padding: 10mm; }
             .graella { gap: 5px; }
             .pictograma { border: 2px solid #000; }
             .zona-revers { padding-top: 15mm !important; margin-top: 0 !important; border: none !important; page-break-before: always; direction: rtl; }
             /* Ajustos específics Dominó Impressió */
             .mode-domino .pictograma { border: 3px solid #000; }
+            .separador-domino { -webkit-print-color-adjust: exact; background-color: #000 !important; }
         }
 
         @media screen and (max-width: 850px) {
@@ -338,7 +349,7 @@
                 <select id="selector-mode" onchange="canviarMode()">
                     <option value="standard">Imatge + Text</option>
                     <option value="targeta">Targeta (Doble Cara)</option>
-                    <option value="domino">Dominó / Joc encadenat</option>
+                    <option value="domino">Dominó</option>
                 </select>
             </div>
             <div class="control-estil" style="flex:1;">
@@ -369,12 +380,20 @@
 
         <div class="btn-container">
             <button class="btn-generar" onclick="generarDocument()">⚡ Generar</button>
-            <button class="btn-domino" id="btn-mix" onclick="barrejarDomino()">🔀 Barrejar per jugar</button>
+            <button class="btn-domino" id="btn-mix" onclick="barrejarDomino()">𔗤 Barrejar fitxes</button>
             <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
         </div>
 
         <div class="instruccions no-print" id="text-instruccions">
             <strong>💡 Consell:</strong> Arrossega per reordenar. Fes clic per editar.
+        </div>
+        
+        <div class="avis-impressio no-print">
+            <strong>⚠️ IMPORTANT PER IMPRIMIR:</strong>
+            <ul style="margin:5px 0; padding-left:20px;">
+                <li>Desmarca l'opció <b>"Capçaleres i peus de pàgina"</b> a la configuració d'impressió.</li>
+                <li><b>Targetes Doble Cara:</b> El sistema ja inverteix el revers automàticament. Només has de seleccionar "Imprimir a doble cara" (girar per la vora llarga).</li>
+            </ul>
         </div>
     </div>
 
@@ -431,7 +450,6 @@
                     <label style="margin-bottom:10px;">Editar Text:</label>
                     <div id="camps-text" class="inputs-container-modal"></div>
                 </div>
-                
                 <div id="tab-arasaac" class="contingut-tab">
                     <div class="cerca-wrapper"><input id="input-arasaac" onkeyup="if(event.key==='Enter') buscarArasaacModal()"><button class="btn-cerca-modal" onclick="buscarArasaacModal()">🔍 Cerca</button></div>
                     <div id="resultats-arasaac" class="resultats-grid"></div>
@@ -465,8 +483,7 @@
     <script>
         let idiomaSeleccionat = 'ca';
         let elementEditant = null;
-        // Emmagatzemem dades per al dominó
-        let dadesDomino = []; // [{img: src, txt: string}, ...]
+        let dadesDomino = []; 
 
         function carregarLogo(input) {
             if (input.files && input.files[0]) {
@@ -490,7 +507,7 @@
             
             if (mode === 'domino') {
                 btnMix.style.display = 'flex';
-                instruccions.innerHTML = "<strong>🎲 Mode Dominó:</strong> Clica 'Barrejar per jugar' per desplaçar els textos i crear una cadena de joc (jo tinc, qui té).";
+                instruccions.innerHTML = "<strong>🎲 Mode Dominó:</strong> Clica 'Barrejar fitxes' per desplaçar els textos i crear combinacions diferents.";
             } else {
                 btnMix.style.display = 'none';
                 instruccions.innerHTML = "<strong>💡 Consell:</strong> Arrossega per reordenar. Fes clic per editar.";
@@ -524,7 +541,6 @@
             contenidor.innerHTML = '';
             contenidorRevers.innerHTML = '';
             
-            // Neteja classes
             contenidor.classList.remove('mode-targeta-front', 'mode-domino');
             contenidorRevers.classList.remove('mode-targeta-back');
             wrapperRevers.style.display = 'none';
@@ -532,9 +548,8 @@
             if (!textParaules.trim()) return; 
             const llista = textParaules.split(',').map(p=>p.trim()).filter(p=>p!=='');
             
-            // Guardem llista inicial per dominó
             if (dadesDomino.length === 0 || dadesDomino.length !== llista.length) {
-                dadesDomino = llista.map(p => ({ txt: p, img: null })); // Img es carregarà asíncronament
+                dadesDomino = llista.map(p => ({ txt: p, img: null })); 
             }
 
             if (mode === 'targeta') {
@@ -552,38 +567,28 @@
 
             } else if (mode === 'domino') {
                 contenidor.classList.add('mode-domino');
-                // Utilitzem dadesDomino per renderitzar
-                // Si és la primera vegada, dadesDomino té txt=paraula, img=null.
-                // Si hem barrejat, dadesDomino té txt desplaçat.
                 
                 for(let i=0; i<llista.length; i++) {
-                    // En mode dominó, renderitzem segons l'array d'estat (per si s'ha barrejat)
-                    // Però la imatge es busca per la paraula ORIGINAL de la llista si no en té
-                    
                     let textMostrar = dadesDomino[i] ? dadesDomino[i].txt : llista[i];
-                    let paraulaOriginal = llista[i]; // Per buscar imatge
+                    let paraulaOriginal = llista[i]; 
                     
                     const div = document.createElement('div');
                     div.className = 'pictograma';
                     div.dataset.index = i;
                     div.dataset.original = paraulaOriginal;
                     
-                    // 1. Imatge
                     const img = document.createElement('img');
                     img.id = `img-${i}-domino`;
-                    // Si ja teníem source guardat (d'una edició anterior o barreja), el fem servir
                     if(dadesDomino[i] && dadesDomino[i].imgUrl) {
                         img.src = dadesDomino[i].imgUrl;
                     } else {
                         img.src = 'https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png';
-                        buscarArasaacDomino(paraulaOriginal, i); // Busca i guarda
+                        buscarArasaacDomino(paraulaOriginal, i); 
                     }
                     
-                    // 2. Separador
                     const separador = document.createElement('div');
                     separador.className = 'separador-domino';
 
-                    // 3. Text
                     const divText = document.createElement('div');
                     divText.className = 'text-domino';
                     divText.innerText = textMostrar;
@@ -592,21 +597,16 @@
                     div.appendChild(separador);
                     div.appendChild(divText);
                     
-                    // Events
-                    div.addEventListener('click', () => obrirModal(div)); // Edita tot el bloc
-                    // Drag and drop simple (mou tot el bloc)
+                    div.addEventListener('click', () => obrirModal(div));
                     div.draggable = true;
                     div.addEventListener('dragstart', ()=>div.classList.add('dragging'));
                     div.addEventListener('dragend', ()=>div.classList.remove('dragging'));
                     
                     contenidor.appendChild(div);
-                    
-                    // Ajustem text dominó
                     setTimeout(() => autoMidaText(divText), 0);
                 }
 
             } else {
-                // Estàndard
                 llista.forEach((paraula, i) => {
                     contenidor.appendChild(crearElementTargeta(paraula, i, 'front'));
                     buscarArasaacAuto(paraula, i);
@@ -615,27 +615,21 @@
             actualitzarEstils();
         }
 
-        // --- BARREJA DOMINÓ (Lògica del Joc) ---
         function barrejarDomino() {
-            // 1. Agafem l'estat actual de les fitxes (per si s'han editat imatges)
             const fitxes = document.querySelectorAll('.pictograma');
             let actualImages = [];
             let actualTexts = [];
 
             fitxes.forEach((f, index) => {
                 const img = f.querySelector('img').src;
-                // Text en dominó és .text-domino
                 const txt = f.querySelector('.text-domino').innerText;
                 actualImages.push(img);
                 actualTexts.push(txt);
             });
 
-            // 2. Desplacem els textos una posició a la dreta (Circular shift)
-            // L'últim text passa a ser el primer.
             const ultimText = actualTexts.pop();
             actualTexts.unshift(ultimText);
 
-            // 3. Actualitzem l'array global dadesDomino
             dadesDomino = [];
             for(let i=0; i<actualImages.length; i++) {
                 dadesDomino.push({
@@ -643,33 +637,24 @@
                     txt: actualTexts[i]
                 });
             }
-
-            // 4. Regenerem només la visualització
-            const llistaOriginal = document.getElementById('llista-paraules').value.split(',');
-            // Truc: cridem generarDocument, ell llegirà dadesDomino
             generarDocument();
             
-            // Feedback
             const btn = document.getElementById('btn-mix');
-            btn.innerText = "✅ Barrejat!";
-            setTimeout(()=> btn.innerText = "🔀 Barrejar per jugar", 1500);
+            btn.innerText = "✅ Fet!";
+            setTimeout(()=> btn.innerText = "🔀 Barrejar fitxes", 1500);
         }
 
         function crearElementTargeta(paraula, index, tipus) {
             const div = document.createElement('div');
             div.className = 'pictograma';
             div.draggable = true; div.dataset.index = index; 
-            
             if (!div.dataset.textos) div.dataset.textos = JSON.stringify([paraula]);
-            
             div.addEventListener('click', () => { if(!div.classList.contains('dragging')) obrirModal(div); });
             div.addEventListener('dragstart', () => { div.classList.add('dragging'); });
             div.addEventListener('dragend', () => { div.classList.remove('dragging'); sincronitzarOrdre(div); });
-
             const img = document.createElement('img');
             img.id = `img-${index}-${tipus}`; 
             img.src = 'https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png'; 
-            
             if (tipus === 'back') {
                 const containerText = document.createElement('div');
                 containerText.id = `text-${index}-${tipus}`;
@@ -702,7 +687,6 @@
             });
         }
         
-        // DRAG & DROP
         const conts = [document.getElementById('contenidor-picts'), document.getElementById('contenidor-revers')];
         conts.forEach(cont => {
             cont.addEventListener('dragover', (e) => {
@@ -724,7 +708,6 @@
             });
         });
 
-        // FUNCIONS TEXT I IMATGE
         function autoMidaText(container) {
             if (!container) return;
             let mida = 60; container.style.fontSize = mida + 'px';
@@ -742,17 +725,13 @@
             } catch(e){}
         }
 
-        // Cerca específica per Dominó (guarda la URL a dadesDomino)
         async function buscarArasaacDomino(text, index) {
             try {
                 const r = await fetch(`https://api.arasaac.org/api/pictograms/${idiomaSeleccionat}/search/${encodeURIComponent(text)}`);
                 const d = await r.json();
                 let src = d.length ? `https://static.arasaac.org/pictograms/${d[0]._id}/${d[0]._id}_500.png` : "https://static.arasaac.org/images/no_results.png";
-                
                 const imgEl = document.getElementById(`img-${index}-domino`);
                 if(imgEl) imgEl.src = src;
-                
-                // Guardem a memòria
                 if(dadesDomino[index]) dadesDomino[index].imgUrl = src;
             } catch(e){}
         }
@@ -765,51 +744,36 @@
         function actualitzarEstils() {
             const doc = document.documentElement.style;
             doc.setProperty('--tipus-font', document.getElementById('selector-font').value);
-            // Mida paper
             const paper = document.getElementById('mida-paper').value;
             if (paper === 'a3') {
                 doc.setProperty('--width-paper', '297mm');
                 doc.setProperty('--height-paper', '420mm');
-                document.body.classList.add('mida-a3');
             } else {
                 doc.setProperty('--width-paper', '210mm');
                 doc.setProperty('--height-paper', '297mm');
-                document.body.classList.remove('mida-a3');
             }
             doc.setProperty('--num-columnes', document.getElementById('selector-columnes').value);
-            
-            // Re-calc text sizes
             if(document.getElementById('selector-mode').value === 'targeta') document.querySelectorAll('.contingut-back').forEach(el => autoMidaText(el));
             if(document.getElementById('selector-mode').value === 'domino') document.querySelectorAll('.text-domino').forEach(el => autoMidaText(el));
         }
 
-        // MODALS I EDICIÓ (Simplificat per espai, lògica idèntica)
         function obrirModal(el) {
             elementEditant = el;
             const index = el.dataset.index;
             const mode = document.getElementById('selector-mode').value;
             let txtInicial = "";
-
-            if (mode === 'domino') {
-                txtInicial = el.querySelector('.text-domino').innerText;
-            } else if (mode === 'targeta') {
+            if (mode === 'domino') txtInicial = el.querySelector('.text-domino').innerText;
+            else if (mode === 'targeta') {
                 const txtBack = document.getElementById(`text-${index}-back`);
                 txtInicial = txtBack ? txtBack.innerText.replace(/\n/g, ', ') : "";
-            } else {
-                txtInicial = el.querySelector('p').innerText;
-            }
-
-            // Camps
+            } else txtInicial = el.querySelector('p').innerText;
             const container = document.getElementById('camps-text');
             container.innerHTML = `<input type="text" id="input-modal-0" value="${txtInicial}" placeholder="Text principal">`;
-            
-            // Cerques inicials
-            let paraulaCerca = el.dataset.original || txtInicial.split(' ')[0]; // Intentem cercar pel nom original
+            let paraulaCerca = el.dataset.original || txtInicial.split(' ')[0]; 
             document.getElementById('input-arasaac').value = paraulaCerca;
             document.getElementById('input-wiki').value = paraulaCerca;
             document.getElementById('input-open').value = paraulaCerca;
             document.getElementById('resultats-traductor').innerHTML = ''; 
-
             document.getElementById('modal-edicio').style.display = 'flex';
             canviarPestanya('tab-arasaac'); 
             if(paraulaCerca) buscarArasaacModal();
@@ -821,22 +785,15 @@
                 const nouText = document.getElementById('input-modal-0').value;
                 const mode = document.getElementById('selector-mode').value;
                 const index = elementEditant.dataset.index;
-
                 if (mode === 'domino') {
-                    // Actualitzem DOM
                     const tDiv = elementEditant.querySelector('.text-domino');
-                    tDiv.innerText = nouText;
-                    autoMidaText(tDiv);
-                    // Actualitzem memòria
+                    tDiv.innerText = nouText; autoMidaText(tDiv);
                     if(dadesDomino[index]) dadesDomino[index].txt = nouText;
                 } else if (mode === 'targeta') {
                     const tBack = document.getElementById(`text-${index}-back`);
                     tBack.innerHTML = `<div class="fila-paraula">${nouText}</div>`;
                     autoMidaText(tBack);
-                    // Frontal opcional (normalment volem mantenir la paraula original al frontal si és flashcard pura, però actualitzem per coherència simple)
-                } else {
-                    elementEditant.querySelector('p').innerText = nouText;
-                }
+                } else { elementEditant.querySelector('p').innerText = nouText; }
             }
             tancarModal();
         }
@@ -852,7 +809,6 @@
             if(elementEditant) { 
                 const index = elementEditant.dataset.index;
                 const mode = document.getElementById('selector-mode').value;
-                
                 if (mode === 'domino') {
                     elementEditant.querySelector('img').src = src;
                     if(dadesDomino[index]) dadesDomino[index].imgUrl = src;
@@ -863,7 +819,6 @@
             } 
         }
 
-        // (La resta de funcions de traducció i cerca són idèntiques a la versió anterior)
         async function traduirParaula() {
             const word = document.getElementById('input-modal-0').value;
             const divRes = document.getElementById('resultats-traductor');
