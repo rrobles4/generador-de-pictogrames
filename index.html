@@ -279,11 +279,16 @@
         .tab-btn.actiu { border-bottom: 3px solid var(--color-principal); color: var(--color-principal); background: white; font-weight: bold; }
         .modal-body { padding: 25px; overflow-y: auto; }
         .grup-titol-modal { margin-bottom: 20px; text-align: center; }
-        .inputs-container-modal { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; justify-content: center; }
         
+        /* ESTILS DINÀMICS MODAL - CORRECCIÓ FILA/COLUMNA */
+        .inputs-container-modal { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; justify-content: center; }
         .input-text-modal { font-size: 1.1em; text-align: center; border: 2px solid #ddd; padding: 8px; border-radius: 6px; box-sizing: border-box; }
+        
+        /* 2 Paraules: Una fila (48% cadascun) */
         .dues-paraules .input-text-modal { width: 48%; }
-        .cinc-paraules .input-text-modal { width: 100%; margin-bottom: 5px; }
+        
+        /* 5 Paraules: Dues files (s'ajusten amb flex, 30% width permet 3 dalt i 2 baix o similar) */
+        .cinc-paraules .input-text-modal { width: 30%; flex-grow: 1; }
         
         .cerca-wrapper { display: flex; gap: 8px; margin-bottom: 15px; }
         .btn-cerca-modal { background: var(--color-principal); border-radius: 8px; padding: 10px 20px; font-size: 1em; flex-shrink: 0; color: white; border: none; cursor: pointer; }
@@ -334,8 +339,11 @@
 <body>
 
     <script>
-        // LOGO PERMANENT DE PICTOJOCS (Nou SVG Integrat)
-        const LOGO_PICTOJOCS_PERMANENT = "data:image/svg+xml,%3Csvg width='150' height='150' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 25 20 L 25 70 L 30 80 L 35 70 L 35 45 A 15 15 0 0 1 65 45 L 65 50' stroke='%233498db' stroke-width='8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M 25 70 L 30 80 L 35 70' fill='%233498db' /%3E%3Cpath d='M 75 20 L 75 70 A 20 20 0 0 1 35 70' stroke='%23e67e22' stroke-width='8' fill='none' stroke-linecap='round' /%3E%3Cline x1='82' y1='25' x2='71' y2='25' stroke='%23e67e22' stroke-width='3' /%3E%3Cline x1='82' y1='35' x2='71' y2='35' stroke='%23e67e22' stroke-width='3' /%3E%3Cline x1='82' y1='45' x2='71' y2='45' stroke='%23e67e22' stroke-width='3' /%3E%3C/svg%3E";
+        // --- CONFIGURACIÓ DEL LOGO DE PICTOJOCS ---
+        // Afegeix aquí l'enllaç RAW del teu repositori de GitHub.
+        // Exemple: "https://raw.githubusercontent.com/EL_TEU_USUARI/EL_TEU_REPO/main/logo.png"
+        
+        const RUTA_LOGO_PICTOJOCS = "https://raw.githubusercontent.com/EL_TEU_USUARI/EL_TEU_REPO/main/logo.png"; // <--- MODIFICA AIXÒ
     </script>
 
     <div class="configuracio">
@@ -513,7 +521,7 @@
                 </div>
                 <div id="tab-pujar" class="contingut-tab" style="display:none;text-align:center;">
                     <p>Puja una imatge pròpia:</p><input type="file" accept="image/*" onchange="pujarImatge(this)">
-                    <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+                    <hr style="margin:20px0; border:0; border-top:1px solid #eee;">
                     <button onclick="window.open('https://www.craiyon.com/','_blank','width=400,height=600')" style="background:#333;color:white;margin:auto;padding:15px;border-radius:50px;">🎨 Generar amb IA</button>
                 </div>
             </div>
@@ -529,13 +537,16 @@
         let idiomaSeleccionat = 'ca';
         let elementEditant = null;
         let dadesDomino = []; 
-        let globalSchoolLogoSrc = ''; // Variable pel logo de l'escola
+        let globalSchoolLogoSrc = ''; 
 
-        // INICIALITZAR LOGO PERMANENT (El teu SVG)
+        // INICIALITZAR LOGO PERMANENT (Enllaç GitHub)
         window.onload = function() {
-            document.getElementById('app-logo-header').src = LOGO_PICTOJOCS_PERMANENT;
-            document.getElementById('print-mini-logo').src = LOGO_PICTOJOCS_PERMANENT;
-            document.getElementById('print-mini-logo-back').src = LOGO_PICTOJOCS_PERMANENT;
+            // Comprovem si s'ha configurat la ruta
+            if (typeof RUTA_LOGO_PICTOJOCS !== 'undefined' && RUTA_LOGO_PICTOJOCS.trim() !== '') {
+                document.getElementById('app-logo-header').src = RUTA_LOGO_PICTOJOCS;
+                document.getElementById('print-mini-logo').src = RUTA_LOGO_PICTOJOCS;
+                document.getElementById('print-mini-logo-back').src = RUTA_LOGO_PICTOJOCS;
+            }
         };
 
         function carregarLogoEscola(input) {
@@ -543,14 +554,11 @@
                 const reader = new FileReader();
                 reader.onload = function(e) { 
                     globalSchoolLogoSrc = e.target.result;
-                    
-                    // Actualitzar només els logos de l'escola (zona impressió)
                     const idsImatges = ['logo-visual', 'logo-visual-back'];
                     idsImatges.forEach(id => {
                         const img = document.getElementById(id);
                         if(img) { img.src = globalSchoolLogoSrc; img.style.display = 'block'; }
                     });
-
                     document.getElementById('wrapper-logo').classList.add('feteservir');
                     document.getElementById('wrapper-logo').innerHTML = "✅ Logo Escola Carregat";
                 }
@@ -564,7 +572,6 @@
             const instruccions = document.getElementById('text-instruccions');
             const avisDobleCara = document.getElementById('avis-doble-cara');
             
-            // Gestió avís doble cara
             if (mode === 'targeta' || mode === 'memory') {
                 avisDobleCara.style.display = 'list-item';
             } else {
@@ -621,7 +628,7 @@
                 dadesDomino = llista.map(p => ({ txt: p, img: null })); 
             }
 
-            if (mode === 'targeta') { // Targeta (Doble Cara)
+            if (mode === 'targeta') { 
                 wrapperRevers.style.display = 'block';
                 contenidor.classList.add('mode-targeta-front');
                 contenidorRevers.classList.add('mode-targeta-back');
@@ -639,19 +646,16 @@
                 contenidor.classList.add('mode-memory-front');
                 
                 llista.forEach((paraula, i) => {
-                    // Fitxa A (Dibuix)
                     const fitxaImg = crearElementTargeta(paraula, i, 'front');
                     fitxaImg.classList.add('nomes-img');
                     contenidor.appendChild(fitxaImg);
 
-                    // Fitxa B (Text)
                     const fitxaText = crearElementTargeta(paraula, i, 'front');
                     fitxaText.classList.add('nomes-text');
                     const pText = fitxaText.querySelector('p');
                     pText.id = `text-memory-${i}`; 
                     contenidor.appendChild(fitxaText);
 
-                    // Reversos FIXOS (Logo PictoJocs)
                     contenidorRevers.appendChild(crearElementReversLogoPictojocs());
                     contenidorRevers.appendChild(crearElementReversLogoPictojocs());
 
@@ -703,7 +707,6 @@
                 }
 
             } else {
-                // Mode Standard (Imatge + Text)
                 llista.forEach((paraula, i) => {
                     contenidor.appendChild(crearElementTargeta(paraula, i, 'front'));
                     buscarArasaacAuto(paraula, i);
@@ -718,7 +721,7 @@
             const content = document.createElement('div');
             content.className = 'contingut-back-logo';
             const img = document.createElement('img');
-            img.src = LOGO_PICTOJOCS_PERMANENT; // Usa el logo permanent
+            img.src = RUTA_LOGO_PICTOJOCS; 
             content.appendChild(img);
             div.appendChild(content);
             return div;
@@ -788,7 +791,7 @@
 
         function sincronitzarOrdre(element) {
             const mode = document.getElementById('selector-mode').value;
-            if (mode === 'memory') return; // No cal al memory
+            if (mode === 'memory') return; 
 
             const isFront = element.parentElement.id === 'contenidor-picts';
             const origen = isFront ? document.getElementById('contenidor-picts') : document.getElementById('contenidor-revers');
@@ -885,16 +888,26 @@
             let maxInputs = 2; 
             let classeLayout = "dues-paraules";
 
+            // Lògica de selecció de quantitat d'inputs
+            if (mode === 'targeta' || mode === 'memory') {
+                maxInputs = 5; 
+                classeLayout = "cinc-paraules";
+            } else {
+                // Imatge + Text i Dominó
+                maxInputs = 2; 
+                classeLayout = "dues-paraules";
+            }
+
+            // Selecció del text existent
             if (mode === 'domino') {
                 containerTxt = el.querySelector('.text-domino');
             } else if (mode === 'targeta') {
                 containerTxt = document.getElementById(`text-${index}-back`);
-                maxInputs = 5; classeLayout = "cinc-paraules";
             } else if (mode === 'memory') {
                  if (el.classList.contains('nomes-text')) {
                     containerTxt = el.querySelector('p');
                  } else {
-                    containerTxt = el.querySelector('p');
+                    containerTxt = el.querySelector('p'); // pot estar amagat però existeix
                  }
             } else {
                 containerTxt = el.querySelector('p');
